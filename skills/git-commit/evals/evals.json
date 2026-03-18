@@ -1,0 +1,117 @@
+{
+  "skill_name": "git-commit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "根据下面的改动信息，帮我写一个符合 Conventional Commits 的 git commit message。\n\n场景：\n用户在快速切换筛选条件时，前一个请求的响应有时会晚于后一个请求返回，导致旧数据覆盖新数据，页面展示错误结果。\n\n实现：\n- 给每次请求分配 request id\n- 只接受当前最新 request id 对应的响应\n- 删除了之前用 setTimeout 缓解竞争条件的旧逻辑\n\n要求：\n- 如果你觉得只需要短 body，就不要写得太长\n- commit message 保持英文",
+      "expected_output": "应优先识别为 fix 类型。标题要明确表达修复请求竞争条件或过期响应覆盖最新状态的问题；如果带 body，正文应简洁说明触发条件、错误表现，以及通过 request id 过滤 stale response 的修复策略。",
+      "files": [],
+      "expectations": [
+        "The output uses a Conventional Commit title with type `fix`.",
+        "The title describes a race condition, stale response, or old data overwriting newer state rather than using vague wording.",
+        "If a body is included, it explains why the bug happens and how request id tracking prevents stale responses from being applied.",
+        "The output is written in English."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "根据下面的改动信息，帮我写一个符合 Conventional Commits 的 git commit message。\n\n场景：\n订单撮合引擎之前每次都线性扫描整个价格层列表来寻找可成交订单。在高频流量下，这段逻辑成了热点路径，P99 延迟明显升高。\n\n实现：\n- 把基于 slice 的顺序扫描改成基于 priority queue 的选择\n- 减少热点路径中的重复扫描\n- 保持撮合语义不变\n- 压测结果：\n  - Avg latency: 1.8ms -> 0.4ms\n  - P99 latency: 4.7ms -> 1.1ms\n\n要求：\n- commit message 保持英文\n- body 体现 why 和 performance impact",
+      "expected_output": "应优先识别为 perf 类型，并给出合理 scope。body 应体现 why-first 的组织方式：先说明线性扫描导致的热点路径瓶颈，再说明 priority queue 优化策略，并尽量保留量化后的性能收益，同时说明行为保持不变。",
+      "files": [],
+      "expectations": [
+        "The output uses a Conventional Commit title with type `perf`.",
+        "The title or scope points to the matching engine, orderbook, or another relevant performance-sensitive module.",
+        "The body explains the performance bottleneck before the implementation details, rather than only restating the title.",
+        "The body mentions the priority queue approach or reduced repeated scans.",
+        "The output presents the measured latency improvements in a clearly structured performance-oriented section, such as `Performance impact:` or `Benchmarks:`.",
+        "The body states or strongly implies that matching behavior remains unchanged.",
+        "The output is written in English."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "这是一个 PR 的改动摘要，帮我生成一个适合 squash merge 的 Conventional Commit commit message。\n\nPR Summary:\n- Replace count-based EMA with time-based EMA in SpreadOracle\n- Interpret EMA_WINDOW as seconds instead of tick count\n- Reduce branching in the hot update path\n- Add TIME_BASED_EMA.md with derivation and migration notes\n- Existing configs must be updated\n- Closes #45\n\n要求：\n- commit message 保持英文\n- 这是 squash merge，所以标题要概括整个 PR 的核心成果\n- 如果你判断这是 breaking change，请按最佳实践写完整",
+      "expected_output": "应生成适合 squash merge 的完整提交信息。标题应概括整个 PR 的核心成果，而不是机械罗列子改动；应识别为 breaking change，并同时使用标题中的 ! 与 BREAKING CHANGE: footer；在这个 skill 的工程语义偏好下，若核心是内部算法/语义替换而非新增面向用户的能力，应优先考虑 `refactor!`；Closes #45 应放在 footer 中。",
+      "files": [],
+      "expectations": [
+        "The output uses a Conventional Commit title that is suitable for a squash merge summary rather than a raw bullet-point list.",
+        "The title includes `!` to mark a breaking change.",
+        "The output includes a `BREAKING CHANGE:` footer in uppercase.",
+        "The `BREAKING CHANGE:` footer explains that EMA_WINDOW now expects seconds or a time duration instead of a tick count.",
+        "The output includes `Closes #45` in the footer area, not in the title.",
+        "The body or title centers the main outcome around moving SpreadOracle from count-based EMA to time-based EMA.",
+        "The output prefers `refactor!` over `feat!` when framing this change, because the main change is an internal semantic replacement with migration impact rather than a new user-facing capability.",
+        "The output is written in English."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "帮我根据下面的信息写一个 Conventional Commit commit message。\n\n改动信息：\n- 重组了通知模块的内部结构\n- 顺手修复了一个偶发的重复发送问题\n- 更新了几处测试\n\n补充说明：\n我不确定这次更适合写 fix 还是 refactor，也不确定 scope 要不要带。\n\n要求：\n- commit message 保持英文\n- 如果信息不足以唯一确定，请不要硬猜",
+      "expected_output": "不应武断地只给一个看似确定的答案。更好的结果是给出 2-3 个候选，并解释为什么一个版本偏 fix、一个版本偏 refactor，以及 scope 是否值得保留。理想结果还应明确推荐其中一个主方案，而不是仅仅并列列出选项。",
+      "files": [],
+      "expectations": [
+        "The output does not pretend there is only one certain answer when the prompt explicitly says the type is ambiguous.",
+        "The output provides multiple candidate commit messages, ideally covering both `fix` and `refactor` interpretations.",
+        "The output explicitly recommends one preferred option in addition to giving alternatives.",
+        "The output explains the tradeoff between choosing `fix` versus `refactor`.",
+        "The output addresses whether a scope for the notification module is useful or optional.",
+        "The output is written in English."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "我现在要实际执行 git commit。请基于当前已经 staged 的改动来完成提交，不要扩大提交范围。\n\n当前状态说明：\n- 已 staged：src/auth/token.ts、src/auth/middleware.ts\n- 未 staged：README.md\n- 新文件但未 tracked：notes.txt\n\n已 staged 改动的主要内容：\n- API 不再接受旧的全局 token\n- 认证中间件现在要求带 scope 的 bearer token\n- token 校验逻辑按 service boundary 做访问控制\n\n要求：\n- 这是实际 commit，不只是写 message\n- 使用 `git commit -s`\n- 不要 `git add` 新文件\n- 只提交 cached/staged 的文件\n- 不要在 commit message 里添加 Claude、Claude Code、bot、Co-Authored-By 或任何 AI 标记\n- commit message 保持英文",
+      "expected_output": "应明确遵守 staged-only 提交范围：不应建议或执行把 README.md 或 notes.txt 纳入本次提交。若给出命令，应使用 git commit -s 并仅基于当前 staged 内容提交；生成的 commit message 应保持英文且不包含任何 Claude、bot 或 Co-Authored-By 标记。理想结果还应把 staged-only 边界明确表达成操作性约束，而不是仅顺带提一句。",
+      "files": [],
+      "expectations": [
+        "The output treats the staged changes as the only source of truth for this commit.",
+        "The output explicitly states that README.md and notes.txt must not be included in this commit, rather than only omitting them implicitly.",
+        "If the output includes a commit command, it uses `git commit -s`.",
+        "The output frames the response as an actual commit workflow, not just as a standalone commit message suggestion.",
+        "The commit message reflects the staged auth/token changes, such as requiring scoped bearer tokens or rejecting legacy global tokens.",
+        "The output does not include any Claude, Claude Code, bot, AI-generated, or `Co-Authored-By` markers in the commit message.",
+        "The commit message content is written in English."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "/git-commit",
+      "expected_output": "当用户直接调用这个 skill 且没有提供额外参数时，应将这次调用本身视为已经明确授权执行 commit，而不是再追问是否要提交。理想输出应直接进入实际 commit 的 workflow 语境：先检查 staged 状态，必要时执行 git add -u，仅基于 staged diff 生成 message，并使用 git commit -s；同时不应加入任何 Claude 或 bot 标记。",
+      "files": [],
+      "expectations": [
+        "The output treats the bare skill invocation with no extra arguments as explicit authorization to execute a commit.",
+        "The output does not ask a follow-up confirmation question like whether it should commit now.",
+        "The output frames the response as an actual commit workflow rather than only offering to draft a commit message.",
+        "The output states or strongly implies that it should inspect staged changes first and fall back to `git add -u` only when nothing is staged.",
+        "If the output includes a commit command, it uses `git commit -s`.",
+        "The output does not add Claude, bot, AI-generated, or `Co-Authored-By` markers to the commit message."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "/git-commit 请根据当前 staged diff 帮我写一条更好的 commit message，先不要真的提交",
+      "expected_output": "当用户通过 skill 入口调用，但同时提供了额外参数，而且参数明确要求“先不要真的提交”时，不应把这次调用误判为无条件直接 commit。理想输出应尊重附加参数，只生成更好的 commit message，并明确当前是在 message-only 模式，而不是执行提交。",
+      "files": [],
+      "expectations": [
+        "The output does not treat a skill invocation with extra arguments as unconditional authorization to commit.",
+        "The output respects the explicit instruction to avoid performing the actual commit.",
+        "The output focuses on drafting or improving the commit message rather than presenting a commit workflow.",
+        "The output does not include a direct `git commit -s` command as something it is about to execute.",
+        "The output provides the commit message content in English."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "我把登录流里的提示文案改了一下，帮我写一个 commit message 就行，不要真的提交。要求是 Conventional Commits，英文。",
+      "expected_output": "普通自然语言里如果用户只要求写 commit message，而且明确说了不要真的提交，skill 应保持 message-only 模式。理想输出是英文的 Conventional Commit 文本，不扩展成实际 commit workflow，也不额外假设获得了执行提交的授权。",
+      "files": [],
+      "expectations": [
+        "The output respects the user's request to only write a commit message and not perform the commit.",
+        "The output stays in message-only mode instead of presenting a full commit workflow.",
+        "The output uses a Conventional Commit title.",
+        "The output is written in English.",
+        "The output does not ask unnecessary follow-up confirmation about committing when the user already said not to commit."
+      ]
+    }
+  ]
+}
