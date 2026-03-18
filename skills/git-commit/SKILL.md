@@ -1,7 +1,7 @@
 ---
 name: git-commit
-description: 生成高质量的 Git 提交信息，并遵循 Conventional Commits / 约定式提交规范，包括 type、可选 scope、description、body、footer、issue 引用，以及在需要时正确添加 BREAKING CHANGE。只要用户提到写 commit message、润色提交信息、根据改动总结提交、按约定式提交规范生成提交说明、为 squash merge 准备提交文本，或希望把 diff / 变更摘要转换成规范提交信息，就应该使用这个 skill。
-version: 0.1.0
+description: Generate high-quality Conventional Commit messages, improve existing commit text, and run clean staged-only git commits when the user explicitly asks to commit. Also applies to Chinese requests about commit messages or git commit workflows.
+license: MIT
 ---
 
 # Git Commit 提交信息写作指南
