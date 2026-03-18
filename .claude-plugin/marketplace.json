@@ -1,0 +1,22 @@
+{
+  "name": "ai-skills",
+  "owner": {
+    "name": "Jack Drogon",
+    "email": "jack.xsuperman@gmail.com"
+  },
+  "metadata": {
+    "description": "A Claude-compatible skills marketplace with focused workflow skills.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "git-tools",
+      "description": "A plugin collection that currently provides the git-commit skill for drafting and executing clean conventional commits.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/git-commit"
+      ]
+    }
+  ]
+}
